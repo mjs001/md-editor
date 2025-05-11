@@ -1,23 +1,43 @@
 import React, { useState, useRef } from "react";
 import { marked } from "marked";
 import html2pdf from "html2pdf.js";
+import "../App.css";
 
 const MarkdownEditor = () => {
 	const [editorContent, setEditorContent] = useState(`# Welcome!`);
+	const [copyStatus, setCopyStatus] = useState("");
 
 	const previewContainerRef = useRef(null);
 
 	const handleTextCopy = () => {
-		if (previewContainerRef.current) {
+		if (!previewContainerRef.current) return;
+
+		try {
 			const htmlContent = previewContainerRef.current.innerHTML;
-			navigator.clipboard
-				.writeText(htmlContent)
-				.then(() => {
-					alert("Copied!");
-				})
-				.catch((err) => {
-					alert("Failed to copy HTML content.");
-				});
+
+			const tempDiv = document.createElement("div");
+			tempDiv.innerHTML = htmlContent;
+
+			const textarea = document.createElement("textarea");
+			textarea.value = tempDiv.innerHTML;
+
+			textarea.style.position = "fixed";
+			textarea.style.opacity = 0;
+
+			document.body.appendChild(textarea);
+
+			textarea.select();
+
+			document.execCommand("copy");
+
+			document.body.removeChild(textarea);
+
+			setCopyStatus("Copied successfully!");
+			setTimeout(() => setCopyStatus(""), 2000);
+		} catch (error) {
+			console.error("Copy failed:", error);
+			setCopyStatus("Failed to copy. Please try again.");
+			setTimeout(() => setCopyStatus(""), 2000);
 		}
 	};
 
@@ -44,75 +64,37 @@ const MarkdownEditor = () => {
 	const renderedHtml = marked.parse(editorContent, { breaks: true });
 
 	return (
-		<div
-			style={{
-				display: "flex",
-				height: "100vh",
-				fontFamily: "Arial, sans-serif",
-			}}
-		>
-			<textarea
-				value={editorContent}
-				onChange={(e) => setEditorContent(e.target.value)}
-				style={{
-					width: "50%",
-					padding: "20px",
-					backgroundColor: "#ffffff",
-					color: "#000000",
-					fontSize: "1rem",
-					border: "none",
-					borderRight: "3px solid #dcdcdc",
-					outline: "none",
-					resize: "none",
-				}}
-			/>
-			<div
-				style={{ width: "50%", backgroundColor: "#f8f8f8", padding: "2rem" }}
-			>
-				<div
-					ref={previewContainerRef}
-					dangerouslySetInnerHTML={{ __html: renderedHtml }}
-					style={{ color: "#333", fontSize: "1.1rem", lineHeight: "1.75" }}
-				/>
-				<div
-					style={{
-						marginTop: "1.5rem",
-						display: "flex",
-						justifyContent: "center",
-						gap: "1.2rem",
-					}}
-				>
-					<button
-						onClick={handleTextCopy}
-						style={{
-							background: "#444",
-							color: "#fff",
-							padding: "8px 16px",
-							border: "none",
-							borderRadius: "4px",
-							cursor: "pointer",
-							boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-						}}
-					>
-						Copy HTML
-					</button>
-					<button
-						onClick={handleDownloadPDF}
-						style={{
-							background: "#28a745",
-							color: "#fff",
-							padding: "8px 16px",
-							border: "none",
-							borderRadius: "4px",
-							cursor: "pointer",
-							boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-						}}
-					>
-						Export
-					</button>
+		<>
+			<div className="editor-wrapper">
+				<h1 className="title">Markdown Editor:</h1>
+				<div className="editor-container">
+					<textarea
+						className="editor-textarea"
+						value={editorContent}
+						onChange={(e) => setEditorContent(e.target.value)}
+					/>
+					<div className="preview-section">
+						<div ref={previewContainerRef} className="preview-container">
+							<div
+								className="preview-content"
+								dangerouslySetInnerHTML={{ __html: renderedHtml }}
+							/>
+						</div>
+						<div className="button-container">
+							<button onClick={handleTextCopy} className="button copy-button">
+								{copyStatus || "Copy HTML"}
+							</button>
+							<button
+								onClick={handleDownloadPDF}
+								className="button export-button"
+							>
+								Export
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
