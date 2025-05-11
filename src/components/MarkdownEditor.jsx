@@ -44,7 +44,7 @@ const MarkdownEditor = () => {
 	const handleDownloadPDF = () => {
 		if (previewContainerRef.current) {
 			const clonedContent = previewContainerRef.current.cloneNode(true);
-			clonedContent.style.backgroundColor = "#ffffff";
+			clonedContent.style.backgroundColor = "transparent";
 			clonedContent.style.color = "#333";
 			clonedContent.style.padding = "2rem";
 			clonedContent.style.width = "100%";
@@ -55,7 +55,7 @@ const MarkdownEditor = () => {
 				.set({
 					margin: 0.5,
 					filename: "document.pdf",
-					html2canvas: { scale: 2 },
+					html2canvas: { scale: 2, backgroundColor: null },
 					jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
 				})
 				.from(clonedContent)
