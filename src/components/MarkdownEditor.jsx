@@ -44,10 +44,12 @@ const MarkdownEditor = () => {
 	const handleDownloadPDF = () => {
 		if (previewContainerRef.current) {
 			const clonedContent = previewContainerRef.current.cloneNode(true);
-			clonedContent.style.backgroundColor = "#f8f8f8";
+			clonedContent.style.backgroundColor = "#ffffff";
 			clonedContent.style.color = "#333";
-			clonedContent.style.padding = "1rem";
+			clonedContent.style.padding = "2rem";
 			clonedContent.style.width = "100%";
+			clonedContent.style.boxShadow = "none";
+			clonedContent.style.border = "none";
 
 			html2pdf()
 				.set({
